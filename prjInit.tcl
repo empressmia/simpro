@@ -16,5 +16,12 @@ namespace eval prjInit {
     exec sed -i "s/@prj_name */$prj_name/g" [pwd]/.$project_file
   } else {
     puts "project file already exists, nothing to be done"
-  }	  
+  }
+  # generate folder structure 
+  file mkdir $prj::source_dir
+  file attributes $prj::source_dir -owner system
+  file mkdir $prj::bench_dir
+  file attributes $pjr::bench_dir -owner system
+  file mkdir $prj::lib_dir
+  file attributes $pjr::lib_dir -owner system
 }
