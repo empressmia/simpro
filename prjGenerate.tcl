@@ -20,16 +20,14 @@ namespace eval prjGenerate {
     puts $fileHandle "\t endif"
     puts $fileHandle "\t cd build && vsim -do ../vsimCompile.tcl"
     puts $fileHandle ".PHONY clean vsim"
+    close $fileHandle
   }
-  
-  proc generate_icestick_makefile {} {
-    file mkdir $prj::sdc_dir
-    file attributes $pjr::sdc_dir -owner system
-    file mkdir $prj::synth_dir
-    file attributes $pjr::synth_dir -owner system
+
+  proc generate_ghdl_makefile {} { 
+    set fileName "ghdl.mk"
+    set fileHandle [open $filename "w"]
 
     set ghdl_options [list --std=08 --workdir=$prj::prj_root/build --work=$prj::design(work)]
-    set yosys_synth_options [list synth_ice40 -json $prj::prj_root/build/build.json]
 
     set analyse_src [list ghdl -a]
     lappend analyse_src $ghdl_options 
@@ -40,13 +38,44 @@ namespace eval prjGenerate {
     lappend analyse_bench [list --std=08 --workdir=$prj::prj_root/build]
     lappend analyse_bench $prj::design(testbench)
 
-    set elaborate_synth [list ghdl -e] 
-    lappend elaborate_synth $ghdl_options 
-    lappend elaborate_synth ${prj::prj_name}_top
-
     set elaborate_bench [list ghdl -e]
     lappend elaborate_bench $ghdl_options
     lappend elaborate_bench tb_$prj::prj_name
+
+    puts $fileHandle "analyse_src:"
+    puts $fileHandle "\t mkdir -p $prj::design(build)"
+    puts $fileHandle "\t [join $analyse_src]\n"
+
+    puts $fileHandle "analyse_bench:"
+    puts $fileHandle "\t make analyse_src"
+    puts $fileHandle "\t [join $analyse_bench]\n"
+
+    puts $fileHandle "sim:"
+    puts $fileHandle "\t make analyse_bench"
+    puts $fileHandle "\t make elaborate_bench"
+    puts $fileHandle "\t ghdl -r $ghdl_options tb_$prj::prj_name"
+
+    close $fileHandle
+  }
+
+  
+  proc generate_yosys_makefile {} {
+    if {![file exists [pwd]"/ghdl.mk"]} {
+      puts "generate makefile for ghdl first!"
+      exit
+    }
+    set filename "yosys.mk"
+    set fileHandle [open $filename "w"]
+    file mkdir $prj::sdc_dir
+    file attributes $pjr::sdc_dir -owner system
+    file mkdir $prj::synth_dir
+    file attributes $pjr::synth_dir -owner system
+
+    set yosys_synth_options [list synth_ice40 -json $prj::prj_root/build/build.json]
+
+    set elaborate_synth [list ghdl -e] 
+    lappend elaborate_synth $ghdl_options 
+    lappend elaborate_synth ${prj::prj_name}_top
 
     set filename "makefile"
     set fileHandle [open $filename "w"]
@@ -55,24 +84,11 @@ namespace eval prjGenerate {
     puts $fileHandle "\t rm -rf $prj::design(synth)"
     puts $fileHandle "\t rm -rf $prj::design(build)\n"
 
-    puts $fileHandle "analyse_src:"
-    puts $fileHandle "\t mkdir -p $prj::design(build)"
-    puts $fileHandle "\t [join $analyse_src]\n"
-
     puts $fileHandle "elaborate_synth:"
     puts $fileHandle "\t [join $elaborate_synth]\n"
 
-    puts $fileHandle "analyse_bench:"
-    puts $fileHandle "\t make analyse_src"
-    puts $fileHandle "\t [join $analyse_bench]\n"
-
     puts $fileHandle "elaborate_bench:"
     puts $fileHandle "\t [join $elaborate_bench]\n"
-
-    puts $fileHandle "sim:"
-    puts $fileHandle "\t make analyse_bench"
-    puts $fileHandle "\t make elaborate_bench"
-    puts $fileHandle "\t ghdl -r $ghdl_options tb_$prj::prj_name"
 
     puts $fileHandle "synthesis_single:"
     puts $fileHandle "\t mkdir -p $prj::design(synth)"
@@ -83,6 +99,17 @@ namespace eval prjGenerate {
     puts $fileHandle "\t make analyse_src"
     puts $fileHandle "\t make elaborate_synth"
     puts $fileHandle "\t make synthesis_single\n"
+
+    close $fileHandle
+  }
+
+  proc generate_icestick_makefile {} {
+    if {![file exists [pwd]"/yosys.mk"]} {
+      puts "generate makefile for yosys first!"
+      exit
+    }
+    set filename "icestick.mk"
+    set fileHandle [open $filename "w"]
 
     puts $fileHandle "pnr:"
     puts $fileHandle "\t nextpnr-ice40 --hx1k --package tq144 --pcf-allow-unconstrained --json $prj::prj_root/build/build.json --pcf $prj::design(sdc) --asc $prj::design(synth)/$prj::prj_name.asc\n"
