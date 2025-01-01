@@ -11,6 +11,7 @@ namespace eval prj {
   set lib_dir "lib"
   set sdc_dir "constraint"
   set formal_dir "formal"
+  set doc_dir "documentation"
 
   set design(src) [glob $prj_root/$source_dir/*.vhd]
   set design(testbench) [glob $prj_root/$bench_dir/tb_*.vhd]
@@ -20,4 +21,6 @@ namespace eval prj {
   set design(sim) $prj_root/$sim_dir
   set design(lib) [glob $prj_root/$lib_dir/*.vhd]
   set design(build) $prj_root/$work_dir
+  set design(formal) $prj_root/$formal_dir
+  set design(doc) $prj_root/$doc_dir
 }
