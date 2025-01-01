@@ -24,4 +24,6 @@ namespace eval prjInit {
   file attributes $pjr::bench_dir -owner system
   file mkdir $prj::lib_dir
   file attributes $pjr::lib_dir -owner system
+  file mkdir $prj::formal_dir
+  file attributes $prj::formal_dir -owner system
 }
