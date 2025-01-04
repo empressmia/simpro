@@ -3,24 +3,24 @@ namespace eval prj {
   set prj_root [file dirname [file normalize [info script]]]
 
   set lib_name $prj_name
-  set work_dir "build"
-  set synth_dir "synth"
-  set bench_dir "bench"
-  set source_dir "src"
-  set sim_dir "sim"
-  set lib_dir "lib"
-  set sdc_dir "constraint"
-  set formal_dir "formal"
-  set doc_dir "documentation"
+  set work_dir [pwd]/build
+  set synth_dir [pwd]/synth
+  set bench_dir [pwd]/bench
+  set source_dir [pwd]/src
+  set sim_dir [pwd]/sim
+  set lib_dir [pwd]/lib
+  set sdc_dir [pwd]/constraint
+  set formal_dir [pwd]/formal
+  set doc_dir [pwd]/documentation
 
-  set design(src) [glob $prj_root/$source_dir/*.vhd]
-  set design(testbench) [glob $prj_root/$bench_dir/tb_*.vhd]
-  set design(sdc) [glob $prj_root/$sdc_dir/*.pcf]
+  set design(src) [glob -nocomplain -dir $source_dir/*.vhd]
+  set design(testbench) [glob -nocomplain -dir $bench_dir/tb_*.vhd]
+  set design(sdc) [glob -nocomplain -dir $sdc_dir/*.sdc]
+  set design(pcf) [glob -nocomplain -dir $sdc_dir/*.pcf]
+  set design(formal) [glob -nocomplain -dir $formal_dir/*.sby]
   set design(work) $prj_name
-  set design(synth) $prj_root/$synth_dir
-  set design(sim) $prj_root/$sim_dir
-  set design(lib) [glob $prj_root/$lib_dir/*.vhd]
-  set design(build) $prj_root/$work_dir
-  set design(formal) $prj_root/$formal_dir
-  set design(doc) $prj_root/$doc_dir
+  set design(lib) [glob -nocomplain -dir $lib_dir/*.vhd]
+
+# set vhdl standard, default is vhdl-2008
+#  set vhdl-std 08
 }
