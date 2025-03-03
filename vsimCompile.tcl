@@ -117,3 +117,7 @@ if {[file isfile start_time.txt] == 0} {
   puts "Project time is $total_time minutes"
 }
 
+puts {
+  ModelSim general compile script version 1.2
+  Copyright (c) Doulos June 2017, SD
+}
