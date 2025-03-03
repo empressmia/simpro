@@ -33,6 +33,10 @@ if {[file exists $wave_radices_file]} {
   }
 }
 
+#
+# the following is taken from doulos modelsim script
+# https://www.doulos.com/knowhow/tcltk/example-tcl-and-tcltk-scripts-for-eda/modelsim-compile-script/
+#
 proc r  {} {uplevel #0 source $::prj::prj_root/vsimCompile.tcl}
 proc rr {} {global last_compile_time
             set last_compile_time 0
