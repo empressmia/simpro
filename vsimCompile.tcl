@@ -1,4 +1,6 @@
 set prj_file ../.prj.tcl
+set wave_file ../waves.tcl
+set wave_radices_file ../wave_radices.tcl
 
 if {[file exists $prj_file] == 1} {
   source $prj_file 
@@ -11,12 +13,24 @@ set design_library [list {*}$prj::design(lib) {*}$prj::design(src) {*}$prj::desi
 
 set top_level              $prj::design(work).tb_$prj::prj_name
 
-set wave_patterns {
+if {[file exists $wave_file]} {
+  source $wave_file
+  set wave_patterns [lrange $signal_list 0 end] 
+} else {
+  puts "wave pattern file does not exist!"
+  set wave_patterns {
                            /tb
-			   /tb_blink/dut/counter_q
+  }
 }
-set wave_radices {
-                           hexadecimal {TB counter_q} 
+
+if {[file exists $wave_radices_file]} {
+  source $wave_radices_file
+  set wave_radices [lrange $radices 0 end]
+} else {
+  puts "wave radices file does not exist!"
+  set wave_radices {
+                           hexadecimal {TB} 
+  }
 }
 
 proc r  {} {uplevel #0 source $::prj::prj_root/vsimCompile.tcl}
@@ -37,13 +51,13 @@ set time_now [clock seconds]
 if [catch {set last_compile_time}] {
   set last_compile_time 0
 }
-vlib $prj::design(build)/$prj::design(work)
-vmap $prj::prj_name $prj::design(build)/$prj::design(work)
+vlib $prj::design(build)
+vmap $prj::prj_name $prj::design(build)
 foreach file $design_library {
   puts "analyzing $file"
   if { $last_compile_time < [file mtime $file] } {
      if [regexp {.vhdl?$} $file] {
-       vcom -quiet -work blink -2008 $file
+         vcom -quiet -work $prj::prj_name -2008 $file
      } else {
        vlog $file
      }
