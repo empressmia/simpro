@@ -25,5 +25,3 @@ ghdl_clean:
 	rm *.o
 	rm tb_$(TOP)
 	
-view_vsim:
-	vsim vcd sim/tb_$(TOP).vcd
