@@ -61,9 +61,9 @@ foreach file $design_library {
   puts "analyzing $file"
   if { $last_compile_time < [file mtime $file] } {
      if [regexp {.vhdl?$} $file] {
-         vcom -quiet -work $prj::prj_name -2008 $file
+         vcom -quiet -64 -work $prj::prj_name -2008 $file
      } else {
-       vlog $file
+       vlog -quiet -64 -work $prj::prj_name -sv09compat $file
      }
      set last_compile_time 0
    }
